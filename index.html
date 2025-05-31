@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa Super Lista de Jogos Co-op! 🎮💖</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior-y: contain;
+        }
+        .menu-item.active {
+            background-color: #ec4899; /* pink-500 */
+            color: white;
+        }
+        .menu-item.active:hover {
+            background-color: #db2777; /* pink-600 */
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9; /* slate-100 */
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* slate-300 */
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; /* slate-400 */
+        }
+        .aspect-video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 0.375rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: #000;
+        }
+        .aspect-video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 0.375rem;
+        }
+        .main-content-mobile {
+             /* Ajustado dinamicamente via JS */
+        }
+        .star-rating span {
+            cursor: pointer;
+            font-size: 1.5rem;
+            /* color é definido dinamicamente no JS */
+        }
+        .favorite-btn {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #d1d5db; /* cinza - padrão para não favorito */
+        }
+        .favorite-btn.active {
+            color: #ef4444; /* vermelho para favorito ativo */
+        }
+        .tag {
+            /* background-color e color são definidos dinamicamente no JS */
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 flex flex-col md:flex-row h-screen overflow-hidden">
+
+    <div id="mobileControlsHeader" class="w-full md:hidden p-4 bg-white shadow-md sticky top-0 z-20 space-y-3">
+        <div>
+            <label for="searchMobile" class="block text-sm font-medium text-pink-600 mb-1">Buscar Jogo:</label>
+            <input type="text" id="searchMobile" placeholder="Nome do jogo..." class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md shadow-sm">
+        </div>
+        <div>
+            <label for="statusFilterMobile" class="block text-sm font-medium text-pink-600 mb-1">Filtrar por Status:</label>
+            <select id="statusFilterMobile" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md shadow-sm">
+                <option value="todos">Todos os Status</option>
+                <option value="Não Jogado">Não Jogado</option>
+                <option value="Queremos Jogar">💖 Queremos Jogar</option>
+                <option value="Jogando">🎮 Jogando</option>
+                <option value="Finalizado">🏆 Finalizado</option>
+                <option value="Pausado">⏳ Pausado</option>
+                <option value="Rejogar">🔁 Rejogar</option>
+            </select>
+        </div>
+        <div>
+            <label for="gameSelect" class="block text-sm font-medium text-pink-600 mb-1">Escolha um Jogo:</label>
+            <select id="gameSelect" name="gameSelect" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md shadow-sm">
+            </select>
+        </div>
+    </div>
+
+    <aside class="w-full md:w-1/4 bg-white shadow-lg p-4 overflow-y-auto custom-scrollbar md:h-full hidden md:block">
+        <h2 class="text-2xl font-bold text-pink-600 mb-6 text-center md:text-left">Nossos Jogos 🎮</h2>
+        <div class="space-y-4 mb-6">
+            <div>
+                <label for="searchDesktop" class="block text-sm font-medium text-pink-600 mb-1">Buscar Jogo:</label>
+                <input type="text" id="searchDesktop" placeholder="Nome do jogo..." class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md shadow-sm">
+            </div>
+            <div>
+                <label for="statusFilterDesktop" class="block text-sm font-medium text-pink-600 mb-1">Filtrar por Status:</label>
+                <select id="statusFilterDesktop" class="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-pink-500 focus:border-pink-500 sm:text-sm rounded-md shadow-sm">
+                    <option value="todos">Todos os Status</option>
+                    <option value="Não Jogado">Não Jogado</option>
+                    <option value="Queremos Jogar">💖 Queremos Jogar</option>
+                    <option value="Jogando">🎮 Jogando</option>
+                    <option value="Finalizado">🏆 Finalizado</option>
+                    <option value="Pausado">⏳ Pausado</option>
+                    <option value="Rejogar">🔁 Rejogar</option>
+                </select>
+            </div>
+        </div>
+        <nav id="gameMenu" class="space-y-2">
+        </nav>
+    </aside>
+
+    <main id="mainContent" class="w-full md:w-3/4 p-4 sm:p-6 lg:p-8 overflow-y-auto custom-scrollbar md:h-full main-content-mobile md:main-content-auto">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl sm:text-4xl font-bold text-pink-600 mb-3">Nossa Lista de Jogos Co-op! 💖</h1>
+            <p class="text-md sm:text-lg text-slate-700">Oi, amor! Explore nossa lista, adicione suas notas e escolham a próxima aventura! 😊</p>
+        </header>
+        <div id="gameDetailsWrapper">
+            <div id="gameDetails" class="rounded-lg shadow-xl min-h-[300px] transition-colors duration-300 ease-in-out" data-current-game-id="">
+                <p class="text-slate-500 text-center py-10 px-6">Selecione um jogo no menu para ver os detalhes!</p>
+            </div>
+        </div>
+        <footer class="text-center mt-10 py-4 border-t border-slate-300">
+            <p class="text-slate-600">Feito com ❤️ para a melhor companheira de jogos!</p>
+        </footer>
+    </main>
+
+    <script>
+        const LOCAL_STORAGE_KEY = 'minhaListaJogosCoopUserData_v1'; 
+
+        // Dados base dos jogos (com descrições detalhadas)
+        const baseGamesData = [
+            {
+                id: "kingdomTwoCrowns", nome: "1. Kingdom Two Crowns", appIdSteam: "701160", linkSteam: "https://store.steampowered.com/app/701160/Kingdom_Two_Crowns/",
+                descricao: "Amor, imagina a gente construindo nosso próprio reino, lado a lado, cavalgando por terras misteriosas e defendendo nossa coroa com unhas e dentes (e muitos arqueiros!). Em Kingdom Two Crowns, cada moeda conta enquanto expandimos nosso domínio e desvendamos segredos em ilhas com uma pixel art linda de viver. Podemos jogar juntinhos no mesmo sofá, cada um com seu monarca, tomando decisões e enfrentando a Ganância que tenta roubar tudo. É uma microestratégia que vai testar nossa cooperação e nos render muitas histórias!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/GnqjjY38anQ",
+                themeColors: { bgHeader: 'bg-sky-700', textHeader: 'text-white', accent: 'text-sky-600', bgCard: 'bg-sky-50', linkHover: 'hover:text-sky-400' },
+                dlcs: [
+                    { nome: "Norse Lands", link: "https://store.steampowered.com/app/1708680/Kingdom_Two_Crowns_Norse_Lands/", tipo: "Expansão de Campanha / Conteúdo" },
+                    { nome: "Call of Olympus", link: "https://store.steampowered.com/app/2736340/Kingdom_Two_Crowns_Call_of_Olympus/", tipo: "Expansão de Campanha / Conteúdo" },
+                    { nome: "Dead Lands", link: "https://store.steampowered.com/app/1299270/Kingdom_Two_Crowns_Dead_Lands/", tipo: "Expansão de Campanha / Conteúdo", gratuito: true },
+                    { nome: "Shogun", link: "https://store.steampowered.com/app/980450/Kingdom_Two_Crowns_Shogun/", tipo: "Pacote de Cenário/Campanha", gratuito: true },
+                    { nome: "Archon's Royal Wardrobe", link: "https://store.steampowered.com/app/3062360/Kingdom_Two_Crowns_Archons_Royal_Wardrobe/", tipo: "Cosmético" },
+                ],
+                trilhasSonoras: [ { nome: "Kingdom Two Crowns: OST", link: "https://store.steampowered.com/app/988810/Kingdom_Two_Crowns_OST/" } ],
+                artbooks: [],
+                generosDetalhados: ["Estratégia", "Simulação", "Pixel Art", "Defesa de Torre", "Side-scroller", "Aventura", "Indie"],
+                tagsPersonalizadas: ["Construção de Reino", "Atmosférico", "Desafiador", "Medieval", "Exploração", "Cooperativo Local"],
+                tempoEstimado: { principal: "18-22h", extras: "25-35h", completo: "40-50h+" },
+                numJogadores: { local: "2", online: "Não" },
+                dataLancamento: "11/12/2018", 
+                desenvolvedora: "Stumpy Squid, Fury Studios, Coatsink", publicadora: "Raw Fury"
+            },
+            {
+                id: "kingdomEighties", nome: "2. Kingdom Eighties", appIdSteam: "1956040", linkSteam: "https://store.steampowered.com/app/1956040/Kingdom_Eighties/",
+                descricao: "Que tal uma viagem nostálgica aos anos 80, meu bem? Em Kingdom Eighties, a gente defende nossa cidadezinha de uma ameaça misteriosa, a Ganância, tudo isso com uma vibe super retrô, neon e fitas cassete! Embora a campanha principal seja mais focada em um jogador descobrindo segredos de família, o jogo mantém o charme da série Kingdom e tem um modo cooperativo local para a gente curtir junto a atmosfera e os desafios de microestratégia. Vamos reviver essa época e construir nossa base!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/CyRava_eWX8",
+                themeColors: { bgHeader: 'bg-pink-600', textHeader: 'text-white', accent: 'text-pink-500', bgCard: 'bg-pink-50', linkHover: 'hover:text-pink-300' },
+                dlcs: [],
+                trilhasSonoras: [ { nome: "Kingdom Eighties: Original Soundtrack", link: "https://store.steampowered.com/app/2227390/Kingdom_Eighties_Original_Soundtrack/" } ],
+                artbooks: [ { nome: "Kingdom Eighties: Art Book", link: "https://store.steampowered.com/app/2434240/Kingdom_Eighties_Art_Book/", tipo: "Artbook Digital" } ],
+                generosDetalhados: ["Estratégia", "Aventura", "Pixel Art", "Anos 80", "Side-scroller", "Indie", "Single-player"],
+                tagsPersonalizadas: ["Nostálgico", "Trilha Sonora Marcante", "História Curta", "Atmosfera Retrô"],
+                tempoEstimado: { principal: "6-8h", extras: "8-10h", completo: "10-12h" },
+                numJogadores: { local: "2 (modo co-op específico)", online: "Não" }, 
+                dataLancamento: "26/06/2023",
+                desenvolvedora: "Fury Studios", publicadora: "Raw Fury"
+            },
+            {
+                id: "monarchy", nome: "3. Monarchy", appIdSteam: "2391650", linkSteam: "https://store.steampowered.com/app/2391650/Monarchy/",
+                descricao: "Amor, que tal liberarmos nossos estrategistas interiores? Em Monarchy, a gente mergulha num mundo 2D onde gerenciamos recursos, construímos uma base impenetrável e partimos para a conquista! Podemos caçar juntos, explorar cavernas misteriosas e liderar nosso exército lado a lado no modo cooperativo local. É a nossa chance de mostrar quem manda e construir um império só nosso!",
+                trailerEmbedUrl: "https://www.youtube.com/embed/IUGFYRl6cz0",
+                themeColors: { bgHeader: 'bg-green-700', textHeader: 'text-white', accent: 'text-green-600', bgCard: 'bg-green-50', linkHover: 'hover:text-green-400' },
+                dlcs: [], trilhasSonoras: [], artbooks: [],
+                generosDetalhados: ["Estratégia", "Gerenciamento de Recursos", "2D", "Defesa de Base", "Side-scroller", "Indie"],
+                tagsPersonalizadas: ["Medieval", "Construção", "Exploração de Cavernas", "Exército", "Acesso Antecipado"],
+                tempoEstimado: { principal: "N/A (Acesso Antecipado)", extras: "N/A", completo: "N/A" },
+                numJogadores: { local: "2", online: "Não" },
+                dataLancamento: "15/03/2024 (Acesso Antecipado)",
+                desenvolvedora: "Two Mammoths", publicadora: "Two Mammoths"
+            },
+            {
+                id: "wargroove", nome: "4. Wargroove", appIdSteam: "607050", linkSteam: "https://store.steampowered.com/app/607050/Wargroove/",
+                descricao: "Meu comandante preferido! Em Wargroove, a gente assume o controle de exércitos fofinhos em pixel art, mas com batalhas estratégicas por turnos super desafiadoras. Podemos jogar a campanha juntos, desvendando a história, ou então soltar a criatividade e criar nossos próprios mapas e cenários para duelos épicos! É perfeito para a gente quebrar a cabeça e celebrar cada vitória tática!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/CacV3hrVA9E",
+                themeColors: { bgHeader: 'bg-orange-500', textHeader: 'text-white', accent: 'text-orange-600', bgCard: 'bg-orange-50', linkHover: 'hover:text-orange-400' },
+                dlcs: [ { nome: "Double Trouble", link: "https://store.steampowered.com/app/1216110/Wargroove__Double_Trouble/", tipo: "Expansão de Conteúdo", gratuito: true } ],
+                trilhasSonoras: [ { nome: "Wargroove Original Soundtrack", link: "https://store.steampowered.com/app/1019150/Wargroove_Original_Soundtrack/" } ],
+                artbooks: [],
+                generosDetalhados: ["Estratégia de Turnos", "Pixel Art", "Tático", "Indie"],
+                tagsPersonalizadas: ["Editor de Mapas", "Campanha Co-op", "Competitivo", "Charme Retrô", "Desafiador"],
+                tempoEstimado: { principal: "20-25h", extras: "30-40h", completo: "60-80h+" },
+                numJogadores: { local: "4", online: "4" },
+                dataLancamento: "01/02/2019",
+                desenvolvedora: "Chucklefish", publicadora: "Chucklefish"
+            },
+            {
+                id: "wargroove2", nome: "5. Wargroove 2", appIdSteam: "1346020", linkSteam: "https://store.steampowered.com/app/1346020/Wargroove_2/",
+                descricao: "Amor, a guerra tática continua! Wargroove 2 traz de volta tudo que a gente amou no primeiro, mas com novas facções para comandarmos, comandantes carismáticos e uma campanha inédita para desbravarmos juntos. As mecânicas estão ainda mais profundas, e tem até um modo roguelike para testar nossa resiliência e estratégia em desafios sempre novos. Pronta para mais batalhas épicas em co-op local?",
+                trailerEmbedUrl: "http://www.youtube.com/embed/gQkw8GS9a_I",
+                themeColors: { bgHeader: 'bg-purple-600', textHeader: 'text-white', accent: 'text-purple-500', bgCard: 'bg-purple-50', linkHover: 'hover:text-purple-300' },
+                dlcs: [],
+                trilhasSonoras: [ { nome: "Wargroove 2 - Soundtrack", link: "https://store.steampowered.com/app/2597750/Wargroove_2__Soundtrack/" } ],
+                artbooks: [],
+                generosDetalhados: ["Estratégia de Turnos", "Pixel Art", "Tático", "Roguelike", "Indie"],
+                tagsPersonalizadas: ["Novas Unidades", "Continuação", "Desafiador", "Conquista", "Roguelike Co-op"],
+                tempoEstimado: { principal: "25-30h", extras: "40-50h", completo: "70-90h+" },
+                numJogadores: { local: "4", online: "4" },
+                dataLancamento: "05/10/2023",
+                desenvolvedora: "Chucklefish", publicadora: "Chucklefish"
+            },
+            {
+                id: "stardewValley", nome: "6. Stardew Valley", appIdSteam: "413150", linkSteam: "https://store.steampowered.com/app/413150/Stardew_Valley/",
+                descricao: "Meu bem, que tal largarmos tudo e começarmos uma vida nova no campo? Em Stardew Valley, a gente herda uma fazendinha e, juntos, podemos transformá-la no nosso cantinho dos sonhos! Vamos cultivar, criar animaizinhos fofos, pescar, explorar minas cheias de perigos e fazer amizade com os moradores da vila. O melhor é que podemos fazer tudo isso em tela dividida, construindo nossa fazenda e nossa história de amor rural. É super relaxante e viciante!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/ot7uXNQskhs",
+                themeColors: { bgHeader: 'bg-emerald-600', textHeader: 'text-white', accent: 'text-emerald-700', bgCard: 'bg-emerald-50', linkHover: 'hover:text-emerald-500' },
+                dlcs: [],
+                trilhasSonoras: [ { nome: "Stardew Valley Soundtrack", link: "https://store.steampowered.com/app/428210/Stardew_Valley_Soundtrack/" } ],
+                artbooks: [],
+                generosDetalhados: ["Simulação de Fazenda", "RPG", "Pixel Art", "Vida Virtual", "Indie", "Cooperativo"],
+                tagsPersonalizadas: ["Relaxante", "Viciante", "Customização", "Relacionamentos", "Exploração", "Infinito", "Aconchegante"],
+                tempoEstimado: { principal: "50-60h", extras: "100-150h", completo: "200-300h+" },
+                numJogadores: { local: "4 (PC/Consoles)", online: "4" },
+                dataLancamento: "26/02/2016",
+                desenvolvedora: "ConcernedApe", publicadora: "ConcernedApe"
+            },
+            {
+                id: "spiritfarer", nome: "7. Spiritfarer®: Farewell Edition", appIdSteam: "972660", linkSteam: "https://store.steampowered.com/app/972660/Spiritfarer_Farewell_Edition/",
+                descricao: "Amor, prepare o lencinho! Spiritfarer é um jogo de gerenciamento super aconchegante e emocionante sobre... a morte. Calma, não é triste como parece! Nós construímos um barco para explorar um mundo lindo, cuidamos de amigos espíritos e os guiamos em sua jornada final. O mais fofo é que podemos jogar juntos: um como Stella, a nova Barqueira das Almas, e o outro como Daffodil, seu gatinho companheiro. É uma experiência linda sobre despedidas e sobre cuidar um do outro.",
+                trailerEmbedUrl: "http://www.youtube.com/embed/ucC2OBokkbI",
+                themeColors: { bgHeader: 'bg-cyan-500', textHeader: 'text-white', accent: 'text-cyan-600', bgCard: 'bg-cyan-50', linkHover: 'hover:text-cyan-400' },
+                dlcs: [], 
+                trilhasSonoras: [ { nome: "Spiritfarer: Original Soundtrack", link: "https://store.steampowered.com/app/1321310/Spiritfarer_Original_Soundtrack/" } ],
+                artbooks: [ { nome: "Spiritfarer: Digital Artbook", link: "https://store.steampowered.com/app/1321300/Spiritfarer_Digital_Artbook/", tipo: "Artbook Digital" } ],
+                generosDetalhados: ["Simulação", "Aventura", "Gestão", "Indie", "Emocional", "Plataforma 2D"],
+                tagsPersonalizadas: ["Aconchegante", "História Rica", "Lindo Visualmente", "Trilha Sonora Relaxante", "Construção de Barco", "Metroidvania Lite", "Emotivo"],
+                tempoEstimado: { principal: "25-30h", extras: "30-35h", completo: "35-40h" },
+                numJogadores: { local: "2", online: "Não" },
+                dataLancamento: "18/08/2020",
+                desenvolvedora: "Thunder Lotus Games", publicadora: "Thunder Lotus Games"
+            },
+            {
+                id: "theSurvivalists", nome: "8. The Survivalists", appIdSteam: "897450", linkSteam: "https://store.steampowered.com/app/897450/The_Survivalists/",
+                descricao: "Pronta para uma aventura selvagem, meu amor? Em The Survivalists, a gente vai parar numa ilha cheia de perigos e mistérios, e o melhor: podemos treinar macaquinhos para nos ajudar! Juntos, com até mais dois amigos online, vamos explorar, construir nosso abrigo, criar ferramentas e enfrentar os desafios dessa ilha. É um sandbox de sobrevivência no universo de The Escapists, então podemos esperar muita diversão e macacadas!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/YsEmt5qKvVk",
+                themeColors: { bgHeader: 'bg-lime-600', textHeader: 'text-white', accent: 'text-lime-700', bgCard: 'bg-lime-50', linkHover: 'hover:text-lime-500' },
+                dlcs: [ { nome: "The Survivalists - Monkey Business Pack", link: "https://store.steampowered.com/app/1256750/The_Survivalists__Monkey_Business_Pack/", tipo: "Pacote Cosmético/Conteúdo" } ],
+                trilhasSonoras: [ { nome: "The Survivalists Soundtrack", link: "https://store.steampowered.com/app/1432770/The_Survivalists_Soundtrack/" } ],
+                artbooks: [ { nome: "The Survivalists - Digital Artbook", link: "https://store.steampowered.com/app/1432780/The_Survivalists_Digital_Artbook/", tipo: "Artbook" } ],
+                generosDetalhados: ["Sobrevivência", "Sandbox", "Aventura", "Pixel Art", "Crafting", "Mundo Aberto", "Cooperativo Online"],
+                tagsPersonalizadas: ["Macacos Ajudantes", "Exploração de Ilhas", "Construção de Base", "Universo The Escapists", "Treinamento de Animais"],
+                tempoEstimado: { principal: "15-20h", extras: "25-35h", completo: "40-50h" },
+                numJogadores: { local: "Não", online: "4" },
+                dataLancamento: "09/10/2020",
+                desenvolvedora: "Team17", publicadora: "Team17"
+            },
+            {
+                id: "itTakesTwo", nome: "9. It Takes Two", appIdSteam: "1426210", linkSteam: "https://store.steampowered.com/app/1426210/It_Takes_Two/",
+                descricao: "Amor, este é O jogo para casais! Em It Takes Two, a gente embarca na jornada mais maluca e emocionante como Cody e May, um casal transformado em bonecos. Cada fase é uma surpresa, com mecânicas de plataforma e quebra-cabeças geniais que SÓ funcionam em co-op. A gente vai precisar colaborar muito, rir das situações bizarras e, quem sabe, até se emocionar com a história. E o melhor: só um de nós precisa ter o jogo, o outro joga junto de graça com o Passe de Amigo!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/ohClxMmNLQQ",
+                themeColors: { bgHeader: 'bg-rose-500', textHeader: 'text-white', accent: 'text-rose-600', bgCard: 'bg-rose-50', linkHover: 'hover:text-rose-400' },
+                dlcs: [], trilhasSonoras: [], artbooks: [],
+                generosDetalhados: ["Plataforma 3D", "Aventura", "Cooperativo", "Quebra-Cabeça", "Ação"],
+                tagsPersonalizadas: ["GOTY Winner", "Criativo", "Variedade de Gameplay", "Emocionante", "História Envolvente", "Passe de Amigo", "Feito para Casais"],
+                tempoEstimado: { principal: "12-14h", extras: "14-16h (mini-games)", completo: "15-18h" },
+                numJogadores: { local: "2", online: "2" },
+                dataLancamento: "26/03/2021",
+                desenvolvedora: "Hazelight Studios", publicadora: "Electronic Arts"
+            },
+            {
+                id: "loversInADangerousSpacetime", nome: "10. Lovers in a Dangerous Spacetime", appIdSteam: "252820", linkSteam: "https://store.steampowered.com/app/252820/Lovers_in_a_Dangerous_Spacetime/",
+                descricao: "Meu amor espacial! Prepare-se para uma aventura colorida e caótica! Em Lovers in a Dangerous Spacetime, nós controlamos juntos uma nave de guerra neon gigante, cada um cuidando de uma parte: torretas, lasers, escudos, propulsores. A gente vai precisar de muita comunicação e trabalho em equipe para navegar por uma galáxia cheia de perigos e resgatar coelhinhos espaciais fofos das garras do Anti-Amor. É pura diversão cooperativa no sofá!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/5L20xxqDfII",
+                themeColors: { bgHeader: 'bg-fuchsia-600', textHeader: 'text-white', accent: 'text-fuchsia-500', bgCard: 'bg-fuchsia-50', linkHover: 'hover:text-fuchsia-300' },
+                dlcs: [],
+                trilhasSonoras: [ { nome: "Lovers in a Dangerous Spacetime Official Soundtrack", link: "https://store.steampowered.com/app/358040/Lovers_in_a_Dangerous_Spacetime_Official_Soundtrack/" } ],
+                artbooks: [],
+                generosDetalhados: ["Ação", "Shoot 'em up", "Cooperativo Local", "Indie", "Espacial"],
+                tagsPersonalizadas: ["Caótico Divertido", "Trabalho em Equipe Intenso", "Visual Neon", "Fofo", "Resgate de Criaturas", "Controles Compartilhados"],
+                tempoEstimado: { principal: "6-8h", extras: "8-10h", completo: "10-12h" },
+                numJogadores: { local: "4", online: "Não" },
+                dataLancamento: "09/09/2015",
+                desenvolvedora: "Asteroid Base", publicadora: "Asteroid Base"
+            },
+            {
+                id: "cassetteBeasts", nome: "11. Cassette Beasts", appIdSteam: "1321440", linkSteam: "https://store.steampowered.com/app/1321440/Cassette_Beasts/",
+                descricao: "Amor, que tal colecionarmos monstros... em fitas cassete? Em Cassette Beasts, a gente explora a ilha de New Wirral, gravando e transformando em monstros incríveis para batalhas por turnos. O mais legal é que podemos FUSIONAR quaisquer duas formas de monstro para criar seres totalmente novos e poderosos! E, claro, podemos desbravar esse mundo aberto e descobrir seus segredos juntinhos no co-op local. A trilha sonora com vocais é um show à parte!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/_8OKh6nqlgw",
+                themeColors: { bgHeader: 'bg-indigo-600', textHeader: 'text-white', accent: 'text-indigo-500', bgCard: 'bg-indigo-50', linkHover: 'hover:text-indigo-300' },
+                dlcs: [
+                    { nome: "Cassette Beasts: Pier of the Unknown", link: "https://store.steampowered.com/app/2202291/Cassette_Beasts_Pier_of_the_Unknown/", tipo: "Expansão de Conteúdo" },
+                    { nome: "Cassette Beasts: Cosplay Pack", link: "https://store.steampowered.com/app/2202290/Cassette_Beasts_Cosplay_Pack/", tipo: "Pacote Cosmético" },
+                    { nome: "Cassette Beasts: Fashion Pack", link: "https://store.steampowered.com/app/3058710/Cassette_Beasts_Fashion_Pack/", tipo: "Pacote Cosmético" },
+                    { nome: "Cassette Beasts: Wing Pack", link: "https://store.steampowered.com/app/2958230/Cassette_Beasts_Wing_Pack/", tipo: "Pacote Cosmético" }
+                ],
+                trilhasSonoras: [
+                    { nome: "Cassette Beasts: Original Soundtrack", link: "https://store.steampowered.com/app/2227370/Cassette_Beasts_Original_Soundtrack/" },
+                    { nome: "Cassette Beasts Acoustic Sessions", link: "https://store.steampowered.com/app/3547030/Cassette_Beasts_Acoustic_Sessions/" }
+                ],
+                artbooks: [ { nome: "Cassette Beasts: The Art Book", link: "https://store.steampowered.com/app/2227380/Cassette_Beasts_The_Art_Book/", tipo: "Artbook" } ],
+                generosDetalhados: ["RPG", "Coleção de Criaturas", "Mundo Aberto", "Pixel Art", "Turnos", "Indie", "Aventura"],
+                tagsPersonalizadas: ["Fusão de Monstros", "Trilha Sonora Incrível (Vocal)", "Exploração", "Estilo Retrô Moderno", "Quebra-Cabeças", "Personagens Carismáticos"],
+                tempoEstimado: { principal: "20-25h", extras: "35-45h", completo: "50-60h+" },
+                numJogadores: { local: "2", online: "Não" },
+                dataLancamento: "26/04/2023",
+                desenvolvedora: "Bytten Studio", publicadora: "Raw Fury"
+            },
+            {
+                id: "monsterSanctuary", nome: "12. Monster Sanctuary", appIdSteam: "814370", linkSteam: "https://store.steampowered.com/app/814370/Monster_Sanctuary/",
+                descricao: "Amor, se a gente curte colecionar e treinar monstrinhos, e ainda por cima adora um bom metroidvania, Monster Sanctuary é a pedida! Aqui, a gente explora um mundo vasto em pixel art, descobrindo segredos e montando nossa equipe de monstros para batalhas estratégicas em turnos. Embora a campanha principal seja single-player, podemos testar nossas equipes um contra o outro em PvP local ou online. Que tal descobrirmos juntos todos os cantos desse santuário?",
+                trailerEmbedUrl: "http://www.youtube.com/embed/iVvpXtrjl5c",
+                themeColors: { bgHeader: 'bg-teal-600', textHeader: 'text-white', accent: 'text-teal-500', bgCard: 'bg-teal-50', linkHover: 'hover:text-teal-300' },
+                dlcs: [ { nome: "Forgotten World", link: "https://store.steampowered.com/app/1830330/Monster_Sanctuary__Forgotten_World/", tipo: "Expansão de Conteúdo", gratuito: true } ],
+                trilhasSonoras: [ { nome: "Soundtrack", link: "https://store.steampowered.com/app/1341380/Monster_Sanctuary_Soundtrack/" } ],
+                artbooks: [ { nome: "Monster Journal", link: "https://store.steampowered.com/app/1341390/Monster_Sanctuary__Monster_Journal/", tipo: "Artbook/Lorebook" } ],
+                generosDetalhados: ["RPG", "Metroidvania", "Coleção de Criaturas", "Pixel Art", "Turnos", "Plataforma"],
+                tagsPersonalizadas: ["Combate Estratégico", "Árvore de Habilidades", "Exploração Profunda", "Quebra-Cabeças Ambientais", "PvP Opcional"],
+                tempoEstimado: { principal: "25-30h", extras: "40-50h", completo: "60-70h+" },
+                numJogadores: { local: "Não (PvP local)", online: "2 (PvP)" },
+                dataLancamento: "15/12/2020",
+                desenvolvedora: "Moi Rai Games", publicadora: "Team17"
+            },
+            {
+                id: "childrenOfMorta", nome: "13. Children of Morta", appIdSteam: "330020", linkSteam: "https://store.steampowered.com/app/330020/Children_of_Morta/",
+                descricao: "Meu bem, prepare-se para uma história emocionante sobre família, sacrifício e heroísmo! Em Children of Morta, a gente joga com os Bergsons, uma família extraordinária de heróis, cada um com suas habilidades e falhas. Juntos, no co-op local, vamos lutar contra uma Corrupção sombria que ameaça o mundo. A pixel art é deslumbrante e a narrativa é super envolvente. Vamos descobrir o verdadeiro significado de lutar por quem a gente ama!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/sXNlDe1UiOY",
+                themeColors: { bgHeader: 'bg-amber-700', textHeader: 'text-white', accent: 'text-amber-600', bgCard: 'bg-amber-50', linkHover: 'hover:text-amber-400' },
+                dlcs: [
+                    { nome: "Ancient Spirits", link: "https://store.steampowered.com/app/1609900/Children_of_Morta__Ancient_Spirits/", tipo: "Expansão de Conteúdo" },
+                    { nome: "Paws and Claws", link: "https://store.steampowered.com/app/1357050/Children_of_Morta__Paws_and_Claws/", tipo: "Conteúdo Adicional", gratuito: true }
+                ],
+                trilhasSonoras: [ { nome: "Children of Morta Original Soundtrack", link: "https://store.steampowered.com/app/1167950/Children_of_Morta_Original_Soundtrack/" } ],
+                artbooks: [ { nome: "Children of Morta Artbook", link: "https://store.steampowered.com/app/1167960/Children_of_Morta_Artbook/", tipo: "Artbook" } ],
+                generosDetalhados: ["ARPG", "Roguelite", "Pixel Art", "Dungeon Crawler", "Hack and Slash", "Indie"],
+                tagsPersonalizadas: ["Narrativa Familiar", "Belos Visuais", "Combate Fluido", "Atmosfera Sombria", "Progressão Persistente", "Emocionante"],
+                tempoEstimado: { principal: "16-20h", extras: "22-28h", completo: "30-40h" },
+                numJogadores: { local: "2", online: "Não" },
+                dataLancamento: "03/09/2019",
+                desenvolvedora: "Dead Mage", publicadora: "11 bit studios"
+            },
+            {
+                id: "cultOfTheLamb", nome: "14. Cult of the Lamb", appIdSteam: "1313140", linkSteam: "https://store.steampowered.com/app/1313140/Cult_of_the_Lamb/",
+                descricao: "Amor, que tal a gente começar nosso próprio culto... de bichinhos fofos (e um pouco sinistros)? Em Cult of the Lamb, a gente é um cordeirinho possuído que precisa construir uma comunidade leal, explorar regiões misteriosas e derrotar falsos profetas. É uma mistura maluca de roguelike de ação com gerenciamento de base, e o melhor: agora podemos jogar a campanha inteira juntinhos no co-op local! Prepare-se para o adorável e o perturbador!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/HqaHnAw9MSk",
+                themeColors: { bgHeader: 'bg-red-700', textHeader: 'text-white', accent: 'text-red-600', bgCard: 'bg-red-50', linkHover: 'hover:text-red-400' },
+                dlcs: [
+                    { nome: "Cultist Pack", link: "https://store.steampowered.com/app/2015880/Cult_of_the_Lamb_Cultist_Pack/", tipo: "Pacote Cosmético/Item" },
+                    { nome: "Heretic Pack", link: "https://store.steampowered.com/app/2331540/Cult_of_the_Lamb_Heretic_Pack/", tipo: "Pacote Cosmético/Item" },
+                    { nome: "Sinful Pack", link: "https://store.steampowered.com/app/2646130/Cult_of_the_Lamb_Sinful_Pack/", tipo: "Pacote Cosmético/Item" },
+                    { nome: "Pilgrim Pack", link: "https://store.steampowered.com/app/2890190/Cult_of_the_Lamb_Pilgrim_Pack/", tipo: "Pacote de Conteúdo/Cosmético" }
+                ],
+                trilhasSonoras: [
+                    { nome: "Cult of the Lamb Soundtrack", link: "https://store.steampowered.com/app/2015890/Cult_of_the_Lamb_Soundtrack/" },
+                    { nome: "Cult of the Lamb: Hymns of the Unholy", link: "https://store.steampowered.com/app/3062350/Cult_of_the_Lamb_Hymns_of_the_Unholy/" }
+                ],
+                artbooks: [],
+                generosDetalhados: ["Roguelike", "Gestão de Culto", "Ação", "Aventura", "Construção de Base", "Indie"],
+                tagsPersonalizadas: ["Fofo e Sinistro", "Combate Rápido", "Humor Negro", "Adorável e Perturbador", "Gerenciamento", "Co-op de Campanha"],
+                tempoEstimado: { principal: "14-18h", extras: "20-25h", completo: "30-40h" },
+                numJogadores: { local: "2 (Com atualização 'Unholy Alliance')", online: "Não" },
+                dataLancamento: "11/08/2022",
+                desenvolvedora: "Massive Monster", publicadora: "Devolver Digital"
+            },
+            {
+                id: "cryptOfTheNecrodancer", nome: "15. Crypt of the NecroDancer", appIdSteam: "247080", linkSteam: "https://store.steampowered.com/app/247080/Crypt_of_the_NecroDancer/",
+                descricao: "Amor, se a gente tem ritmo no sangue (ou quer testar se tem!), este é o desafio! Crypt of the NecroDancer é um roguelike hardcore onde a gente precisa se mover e atacar no ritmo da música para sobreviver a masmorras cheias de esqueletos dançantes e dragões. A trilha sonora é INCRÍVEL e podemos jogar juntinhos no co-op local, tentando não tropeçar um no pé do outro. É difícil, mas super recompensador!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/u_avgU1u6yM",
+                themeColors: { bgHeader: 'bg-violet-700', textHeader: 'text-white', accent: 'text-violet-500', bgCard: 'bg-violet-50', linkHover: 'hover:text-violet-300' },
+                dlcs: [
+                    { nome: "Crypt of the NecroDancer: AMPLIFIED", link: "https://store.steampowered.com/app/588350/Crypt_of_the_NecroDancer_AMPLIFIED/", tipo: "Expansão de Conteúdo" },
+                    { nome: "Crypt of the NecroDancer: SYNCHRONY", link: "https://store.steampowered.com/app/1666000/Crypt_of_the_NecroDancer_SYNCHRONY/", tipo: "Expansão de Conteúdo" },
+                    { nome: "Crypt of the NecroDancer: Hatsune Miku Character DLC", link: "https://store.steampowered.com/app/2828720/Crypt_of_the_NecroDancer_Hatsune_Miku_Character_DLC/", tipo: "Personagem DLC" }
+                ],
+                trilhasSonoras: [
+                    { nome: "Crypt of the NecroDancer Original Danny Baranowsky Soundtrack", link: "https://store.steampowered.com/app/320750/Crypt_of_the_Necrodancer_Original_Danny_Baranowsky_Soundtrack/" },
+                    { nome: "Crypt of the NecroDancer Extended Soundtrack", link: "https://store.steampowered.com/app/374780/Crypt_of_the_NecroDancer_Extended_Soundtrack/" },
+                    { nome: "Crypt of the NecroDancer: AMPLIFIED OST - Danny Baranowsky", link: "https://store.steampowered.com/app/588360/Crypt_of_the_NecroDancer_AMPLIFIED_OST__Danny_Baranowsky/" }
+                ],
+                artbooks: [],
+                generosDetalhados: ["Roguelike", "Ritmo", "Pixel Art", "Música", "Indie", "Dungeon Crawler"],
+                tagsPersonalizadas: ["Trilha Sonora Matadora (Danny B!)", "Difícil pra Caramba", "Rejogabilidade Alta", "Movimento Baseado em Batida", "Desafio de Coordenação"],
+                tempoEstimado: { principal: "8-12h (para finalizar uma vez)", extras: "50-100h+ (para tudo)", completo: "150h++" },
+                numJogadores: { local: "2", online: "Até 8 com DLC SYNCHRONY" },
+                dataLancamento: "23/04/2015",
+                desenvolvedora: "Brace Yourself Games", publicadora: "Brace Yourself Games, Klei Entertainment (SYNCHRONY)"
+            },
+            {
+                id: "broforce", nome: "16. Broforce", appIdSteam: "274190", linkSteam: "https://store.steampowered.com/app/274190/Broforce/",
+                descricao: "BRO! Digo, AMOR! Prepare-se para uma overdose de testosterona, explosões e liberdade! Em Broforce, a gente controla uma equipe de heróis de ação dos anos 80 (parodiados, claro!) e sai destruindo tudo em nome da... bem, da BROFORCE! Podemos jogar com até quatro amigos, local ou online, em fases 2D super caóticas e totalmente destrutíveis. É pura diversão descerebrada e hilária!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/8c2aYrFV9uE",
+                themeColors: { bgHeader: 'bg-yellow-600', textHeader: 'text-white', accent: 'text-yellow-500', bgCard: 'bg-yellow-50', linkHover: 'hover:text-yellow-300' },
+                dlcs: [],
+                trilhasSonoras: [ { nome: "Broforce: The Soundtrack", link: "https://store.steampowered.com/app/396970/Broforce_The_Soundtrack/" } ],
+                artbooks: [],
+                generosDetalhados: ["Ação", "Plataforma", "Pixel Art", "Run and Gun", "Destrutível", "Indie", "Cooperativo Online", "Cooperativo Local"],
+                tagsPersonalizadas: ["Explosões!", "Paródia de Filmes de Ação", "Caótico", "Over-the-top", "Muitos Personagens", "Humor Ácido"],
+                tempoEstimado: { principal: "6-8h", extras: "10-12h", completo: "15-20h" },
+                numJogadores: { local: "4", online: "4" },
+                dataLancamento: "15/10/2015",
+                desenvolvedora: "Free Lives", publicadora: "Devolver Digital"
+            },
+            {
+                id: "cuphead", nome: "17. Cuphead", appIdSteam: "268910", linkSteam: "https://store.steampowered.com/app/268910/Cuphead/",
+                descricao: "Meu bem, se a gente gosta de um desafio e de arte impecável, Cuphead é o nosso jogo! Inspirado nas animações clássicas dos anos 1930, ele é um run and gun focado em batalhas contra chefes INCRIVELMENTE difíceis (mas justas!). Podemos jogar como Xicrinho e Caneco no co-op local, atravessando mundos bizarramente lindos e tentando não quebrar o controle. A trilha sonora de jazz é contagiante! Pronta para testar nossa paciência e habilidade?",
+                trailerEmbedUrl: "http://www.youtube.com/embed/NN-9SQXoi50",
+                themeColors: { bgHeader: 'bg-red-500', textHeader: 'text-white', accent: 'text-red-600', bgCard: 'bg-red-50', linkHover: 'hover:text-red-400' },
+                dlcs: [ { nome: "Cuphead - The Delicious Last Course", link: "https://store.steampowered.com/app/1117850/Cuphead__The_Delicious_Last_Course/", tipo: "Expansão de Conteúdo" } ],
+                trilhasSonoras: [
+                    { nome: "Cuphead Original Soundtrack", link: "https://store.steampowered.com/app/622630/Cuphead_Original_Soundtrack/" },
+                    { nome: "Cuphead - The Delicious Last Course - Official Soundtrack", link: "https://store.steampowered.com/app/2053660/Cuphead__The_Delicious_Last_Course__Official_Soundtrack/" }
+                ],
+                artbooks: [],
+                generosDetalhados: ["Plataforma", "Run and Gun", "Animação Clássica", "Difícil", "Ação", "Indie", "Boss Rush"],
+                tagsPersonalizadas: ["Estilo de Arte Único", "Trilha Sonora Jazz", "Desafiador ao Extremo", "Animação Feita à Mão", "Preciso", "Recompensador"],
+                tempoEstimado: { principal: "10-12h", extras: "14-16h (com DLC)", completo: "20-25h (com DLC e S-Ranks)" },
+                numJogadores: { local: "2", online: "Não" },
+                dataLancamento: "29/09/2017",
+                desenvolvedora: "Studio MDHR Entertainment Inc.", publicadora: "Studio MDHR Entertainment Inc."
+            },
+            {
+                id: "pizzaPossum", nome: "18. Pizza Possum", appIdSteam: "1951230", linkSteam: "https://store.steampowered.com/app/1951230/Pizza_Possum/",
+                descricao: "Amor, que tal a gente virar gambazinhos arteiros e famintos por pizza? Em Pizza Possum, nosso objetivo é simples: comer o máximo de comida que a gente conseguir sem ser pego pelos cães de guarda! Podemos jogar juntinhos no co-op local, usando itens, nos escondendo e bolando planos mirabolantes para chegar ao trono do líder dos cães e roubar sua pizza gigante. É pura diversão arcade caótica e fofinha!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/0GeWLeDWjng",
+                themeColors: { bgHeader: 'bg-lime-500', textHeader: 'text-white', accent: 'text-lime-600', bgCard: 'bg-lime-50', linkHover: 'hover:text-lime-400' },
+                dlcs: [], trilhasSonoras: [], artbooks: [],
+                generosDetalhados: ["Arcade", "Ação", "Stealth", "Fofo", "Indie", "3D", "Cooperativo Local"],
+                tagsPersonalizadas: ["Gambás!", "Comer Tudo", "Curto e Divertido", "Humor", "Esconderijo", "Para Rir Juntos"],
+                tempoEstimado: { principal: "1-2h", extras: "2-3h", completo: "3-4h" },
+                numJogadores: { local: "2", online: "Não" },
+                dataLancamento: "28/09/2023",
+                desenvolvedora: "Cosy Computer", publicadora: "Raw Fury"
+            },
+            {
+                id: "overcooked", nome: "19. Overcooked!", appIdSteam: "448510", linkSteam: "https://store.steampowered.com/app/448510/Overcooked/",
+                descricao: "Meu chef preferido! Prepare-se para o caos na cozinha! Em Overcooked!, a gente trabalha em equipe (ou tenta!) para preparar, cozinhar e servir pratos deliciosos antes que os clientes percam a paciência. As cozinhas são malucas, os pedidos não param de chegar e a comunicação é ESSENCIAL. Podemos jogar com até quatro amigos no sofá. Será que nosso relacionamento sobrevive a essa pressão culinária? Só risadas (e talvez alguns gritos)!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/0ZK7veYPEJQ",
+                themeColors: { bgHeader: 'bg-orange-400', textHeader: 'text-slate-800', accent: 'text-orange-500', bgCard: 'bg-orange-50', linkHover: 'hover:text-orange-300' },
+                dlcs: [
+                    { nome: "The Lost Morsel", link: "https://store.steampowered.com/app/503560/Overcooked_The_Lost_Morsel/", tipo: "Pacote de Conteúdo" },
+                    { nome: "Festive Seasoning", link: "https://store.steampowered.com/app/556730/Overcooked_Festive_Seasoning/", tipo: "Pacote de Conteúdo", gratuito: true }
+                ],
+                trilhasSonoras: [], artbooks: [],
+                generosDetalhados: ["Cooperativo Local", "Simulação de Culinária", "Party Game", "Caótico", "Indie", "Estratégia Leve", "Gestão de Tempo"],
+                tagsPersonalizadas: ["Amizades Testadas", "Comunicação é Chave", "Frenético", "Replay Value", "Cozinhas Malucas", "Para Jogar em Grupo"],
+                tempoEstimado: { principal: "5-7h", extras: "7-9h (com DLCs)", completo: "10-12h" },
+                numJogadores: { local: "4", online: "Não" },
+                dataLancamento: "03/08/2016",
+                desenvolvedora: "Ghost Town Games Ltd.", publicadora: "Team17 Digital Ltd"
+            },
+            {
+                id: "overcooked2", nome: "20. Overcooked! 2", appIdSteam: "728880", linkSteam: "https://store.steampowered.com/app/728880/Overcooked_2/",
+                descricao: "Amor, o Reino da Cebola precisa de nós novamente! Overcooked! 2 eleva o caos culinário a um novo nível, agora com co-op online para a gente jogar mesmo à distância! Novas receitas, cozinhas ainda mais dinâmicas (e perigosas!) e a habilidade de ARREMESSAR ingredientes. Segure o avental, porque a gente vai precisar de muita coordenação e risadas para salvar o mundo... cozinhando!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/lcVISRmANIo",
+                themeColors: { bgHeader: 'bg-sky-400', textHeader: 'text-white', accent: 'text-sky-500', bgCard: 'bg-sky-50', linkHover: 'hover:text-sky-300' },
+                dlcs: [
+                    { nome: "Surf 'n' Turf", link: "https://store.steampowered.com/app/893300/Overcooked_2__Surf_n_Turf/", tipo: "Pacote de Conteúdo" },
+                    { nome: "Campfire Cook Off", link: "https://store.steampowered.com/app/1004670/Overcooked_2__Campfire_Cook_Off/", tipo: "Pacote de Conteúdo" },
+                    { nome: "Night of the Hangry Horde", link: "https://store.steampowered.com/app/1004680/Overcooked_2__Night_of_the_Hangry_Horde/", tipo: "Pacote de Conteúdo" },
+                    { nome: "Carnival of Chaos", link: "https://store.steampowered.com/app/1137750/Overcooked_2__Carnival_of_Chaos/", tipo: "Pacote de Conteúdo" },
+                    { nome: "Too Many Cooks Pack", link: "https://store.steampowered.com/app/893310/Overcooked_2__Too_Many_Cooks_Pack/", tipo: "Pacote Cosmético/Personagem" },
+                    { nome: "Overcooked! 2 - Season Pass", link: "https://store.steampowered.com/app/1067770/Overcooked_2__Season_Pass/", tipo: "Passe de Temporada" }
+                ],
+                trilhasSonoras: [], artbooks: [],
+                generosDetalhados: ["Cooperativo Online", "Cooperativo Local", "Simulação de Culinária", "Party Game", "Caótico", "Indie", "Gestão de Tempo"],
+                tagsPersonalizadas: ["Mais Conteúdo", "Arremessar Ingredientes", "Novas Mecânicas", "Cozinhas Dinâmicas", "Multiplayer Online"],
+                tempoEstimado: { principal: "7-9h", extras: "15-20h (com DLCs)", completo: "25-35h+ (com DLCs e 4 estrelas)" },
+                numJogadores: { local: "4", online: "4" },
+                dataLancamento: "07/08/2018",
+                desenvolvedora: "Team17, Ghost Town Games Ltd.", publicadora: "Team17 Digital Ltd"
+            },
+            {
+                id: "unrailed", nome: "21. Unrailed!", appIdSteam: "1016920", linkSteam: "https://store.steampowered.com/app/1016920/Unrailed/",
+                descricao: "Meu amor, prepare-se para uma construção de trilhos frenética e hilária! Em Unrailed!, a gente precisa trabalhar MUITO junto para construir uma linha de trem através de mundos gerados proceduralmente, coletando recursos e evitando que nosso trem descarrilhe. Cada partida é uma nova aventura caótica, onde a comunicação e a divisão de tarefas são cruciais. Podemos jogar localmente ou online. Será que conseguimos levar nosso trem ao infinito e além?",
+                trailerEmbedUrl: "http://www.youtube.com/embed/BiqE0_iXXy0",
+                themeColors: { bgHeader: 'bg-yellow-400', textHeader: 'text-slate-800', accent: 'text-yellow-500', bgCard: 'bg-yellow-50', linkHover: 'hover:text-yellow-300' },
+                dlcs: [ { nome: "Unrailed! - Supporter Pack", link: "https://store.steampowered.com/app/1150940/Unrailed__Supporter_Pack/", tipo: "Pacote de Suporte/Cosmético" } ],
+                trilhasSonoras: [
+                    { nome: "Unrailed! - Soundtrack", link: "https://store.steampowered.com/app/1150941/Unrailed_Soundtrack/" },
+                    { nome: "Unrailed! - Soundtrack: Underwater EP", link: "https://store.steampowered.com/app/2469310/Unrailed__Soundtrack_Underwater_EP/" }
+                ],
+                artbooks: [],
+                generosDetalhados: ["Cooperativo Online", "Cooperativo Local", "Construção", "Roguelike", "Pixel Art", "Estratégia", "Indie", "Ação"],
+                tagsPersonalizadas: ["Frenético", "Trabalho em Equipe Essencial", "Gerenciamento de Recursos", "Desafiador", "Geração Procedural", "Construção de Trilhos"],
+                tempoEstimado: { principal: "N/A (foco no gameplay infinito/corrida)", extras: "", completo: "" },
+                numJogadores: { local: "4", online: "4" },
+                dataLancamento: "23/09/2020",
+                desenvolvedora: "Indoor Astronaut", publicadora: "Daedalic Entertainment, bilibili (China)"
+            },
+            {
+                id: "unrailed2", nome: "22. Unrailed 2: Back on Track", appIdSteam: "2211170", linkSteam: "https://store.steampowered.com/app/2211170/Unrailed_2_Back_on_Track/",
+                descricao: "Amor, a loucura dos trilhos está de volta e melhorada! Unrailed 2: Back on Track promete mais caos cooperativo enquanto a gente constrói ferrovias em mundos ainda mais variados, com novos biomas e até chefes para enfrentar! Podemos melhorar nossos personagens e o motor do trem, e até criar nossos próprios níveis para desafios personalizados. Se a gente curtiu o primeiro, este aqui tem tudo para ser nossa próxima obsessão em co-op local ou online!",
+                trailerEmbedUrl: "http://www.youtube.com/embed/85G4LNGxU2U",
+                themeColors: { bgHeader: 'bg-cyan-400', textHeader: 'text-slate-800', accent: 'text-cyan-500', bgCard: 'bg-cyan-50', linkHover: 'hover:text-cyan-300' },
+                dlcs: [ { nome: "Unrailed 2: Back on Track – Supporter Pack", link: "https://store.steampowered.com/app/3393870/Unrailed_2_Back_on_Track__Supporter_Pack/", tipo: "Pacote de Suporte/Cosmético" } ],
+                trilhasSonoras: [ { nome: "Unrailed 2: Back on Track – Soundtrack", link: "https://store.steampowered.com/app/3393871/Unrailed_2_Back_on_Track_Soundtrack/" } ],
+                artbooks: [],
+                generosDetalhados: ["Cooperativo Online", "Cooperativo Local", "Construção", "Roguelike", "Pixel Art", "Estratégia", "Indie", "Ação"],
+                tagsPersonalizadas: ["Novos Biomas", "Chefes", "Customização de Personagem", "Editor de Níveis", "Física Aprimorada", "Continuação Promissora", "Acesso Antecipado"],
+                tempoEstimado: { principal: "N/A (Acesso Antecipado)", extras: "N/A", completo: "N/A" },
+                numJogadores: { local: "4", online: "4" },
+                dataLancamento: "A Ser Anunciado (Previsto para 2024 em Acesso Antecipado)",
+                desenvolvedora: "Indoor Astronaut", publicadora: "astragon Entertainment"
+            }
+        ];
+        
+        let gamesData = []; 
+
+        const gameMenu = document.getElementById('gameMenu');
+        const gameSelect = document.getElementById('gameSelect');
+        const gameDetailsContainer = document.getElementById('gameDetails');
+        const mainContent = document.getElementById('mainContent');
+        const searchDesktop = document.getElementById('searchDesktop');
+        const statusFilterDesktop = document.getElementById('statusFilterDesktop');
+        const searchMobile = document.getElementById('searchMobile');
+        const statusFilterMobile = document.getElementById('statusFilterMobile');
+        const mobileControlsHeader = document.getElementById('mobileControlsHeader');
+
+        const expansionContentTypes = ["Expansão de Campanha / Conteúdo", "Expansão de Conteúdo", "Pacote de Cenário/Campanha", "Conteúdo Adicional", "Personagem DLC", "Pacote de Conteúdo", "Passe de Temporada"];
+        const cosmeticContentTypes = ["Cosmético", "Pacote Cosmético/Item", "Pacote Cosmético/Conteúdo", "Pacote de Suporte/Cosmético", "Pacote Cosmético/Personagem", "Pacote de Conteúdo/Cosmético", "Pacote Cosmético"];
+
+        function getUserData() {
+            const data = localStorage.getItem(LOCAL_STORAGE_KEY);
+            return data ? JSON.parse(data) : {};
+        }
+
+        function saveUserData(gameId, field, value) {
+            const allUserData = getUserData();
+            if (!allUserData[gameId]) {
+                allUserData[gameId] = {};
+            }
+            allUserData[gameId][field] = value;
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(allUserData));
+        }
+        
+        function loadAndMergeGamesData() {
+            const userData = getUserData();
+            gamesData = baseGamesData.map(baseGame => {
+                const userGameData = userData[baseGame.id] || {};
+                return {
+                    ...baseGame, 
+                    avaliacao: userGameData.avaliacao !== undefined ? userGameData.avaliacao : 0,
+                    anotacoes: userGameData.anotacoes !== undefined ? userGameData.anotacoes : "",
+                    status: userGameData.status !== undefined ? userGameData.status : "Não Jogado", 
+                    favorito: userGameData.favorito !== undefined ? userGameData.favorito : false,
+                };
+            });
+        }
+
+        function generateSectionHtml(title, items, gameTheme, itemGratuitoKey = 'gratuito') {
+            const { textHeader, accent, linkHover, bgCard } = gameTheme;
+            const isDarkBgCard = bgCard.includes('700') || bgCard.includes('800') || bgCard.includes('900') || bgCard.includes('slate-800') || bgCard.includes('slate-700');
+            
+            const headerStyle = isDarkBgCard ? 'text-slate-100' : (textHeader.includes('white') ? 'text-slate-700' : textHeader);
+            const contentStyle = isDarkBgCard ? 'text-slate-300' : (textHeader.includes('white') ? 'text-slate-600' : textHeader.replace('text-', 'text-slate-'));
+            const textLinkStyle = `${accent} ${linkHover} transition-colors`;
+            const gratuitoStyle = isDarkBgCard ? 'text-green-400' : 'text-green-600';
+
+            let sectionHtml = `<div class="mt-4">
+                                <h3 class="text-lg font-semibold ${headerStyle}">${title}:</h3>`;
+            if (items && items.length > 0) {
+                sectionHtml += `<ul class="list-disc list-inside ml-4 ${contentStyle} space-y-1 mt-1">`;
+                items.forEach(item => {
+                    sectionHtml += `<li><a href="${item.link}" target="_blank" class="${textLinkStyle}">${item.nome}</a>${item[itemGratuitoKey] ? ` <span class="${gratuitoStyle} font-semibold">(Gratuito)</span>` : ''}</li>`;
+                });
+                sectionHtml += `</ul>`;
+            } else {
+                sectionHtml += `<p class="${contentStyle} mt-1">Nenhum.</p>`;
+            }
+            sectionHtml += `</div>`;
+            return sectionHtml;
+        }
+        
+        function renderStars(gameId, currentRating, gameTheme) {
+            const { bgCard } = gameTheme;
+            const isDarkBgCard = bgCard.includes('700') || bgCard.includes('800') || bgCard.includes('900') || bgCard.includes('slate-800') || bgCard.includes('slate-700');
+            const emptyStarColor = isDarkBgCard ? 'text-slate-500' : 'text-gray-300';
+            const filledStarColor = 'text-yellow-400'; 
+
+            let starsHtml = '';
+            for (let i = 1; i <= 5; i++) {
+                starsHtml += `<span data-value="${i}" class="${i <= currentRating ? filledStarColor : emptyStarColor} ${i <= currentRating ? 'filled' : ''}">${i <= currentRating ? '★' : '☆'}</span>`;
+            }
+            const starContainer = document.getElementById(`stars-${gameId}`);
+            if (starContainer) starContainer.innerHTML = starsHtml;
+
+            document.querySelectorAll(`#stars-${gameId} span`).forEach(star => {
+                star.addEventListener('click', () => {
+                    const newRating = parseInt(star.dataset.value);
+                    const game = gamesData.find(g => g.id === gameId);
+                    if (game) { 
+                        game.avaliacao = newRating; 
+                        saveUserData(gameId, 'avaliacao', newRating); 
+                        renderStars(gameId, newRating, gameTheme); 
+                    }
+                });
+                star.addEventListener('mouseover', () => {
+                    document.querySelectorAll(`#stars-${gameId} span`).forEach(s => {
+                        s.classList.remove(filledStarColor);
+                        s.classList.add(emptyStarColor);
+                        s.textContent = '☆';
+                        if (parseInt(s.dataset.value) <= parseInt(star.dataset.value)) {
+                            s.classList.add(filledStarColor);
+                            s.classList.remove(emptyStarColor);
+                            s.textContent = '★';
+                        }
+                    });
+                });
+                star.addEventListener('mouseout', () => {
+                     const game = gamesData.find(g => g.id === gameId);
+                     if (game) renderStars(gameId, game.avaliacao, gameTheme);
+                });
+            });
+        }
+
+        function displayGameDetails(game) {
+            if (!game) {
+                 gameDetailsContainer.innerHTML = '<p class="text-slate-500 text-center py-10 px-6">Jogo não encontrado.</p>';
+                 gameDetailsContainer.className = `rounded-lg shadow-xl min-h-[300px] transition-colors duration-300 ease-in-out bg-white`;
+                 gameDetailsContainer.dataset.currentGameId = "";
+                 return;
+            }
+            gameDetailsContainer.dataset.currentGameId = game.id;
+
+            const { bgHeader, textHeader, accent, bgCard, linkHover } = game.themeColors;
+            const gameCoverUrl = `https://cdn.akamai.steamstatic.com/steam/apps/${game.appIdSteam}/header.jpg`;
+            const youtubeEmbedUrl = game.trailerEmbedUrl;
+            
+            const isDarkBgCard = bgCard.includes('700') || bgCard.includes('800') || bgCard.includes('900') || bgCard.includes('slate-800') || bgCard.includes('slate-700');
+            const detailHeaderStyle = isDarkBgCard ? 'text-slate-100' : (textHeader.includes('white') ? 'text-slate-700' : textHeader);
+            const detailContentStyle = isDarkBgCard ? 'text-slate-200' : (textHeader.includes('white') ? 'text-slate-600' : textHeader.replace('text-', 'text-slate-'));
+            const detailInputBgStyle = isDarkBgCard ? 'bg-slate-700 text-white border-slate-600' : 'bg-white text-slate-900 border-gray-300';
+            const detailTagBgStyle = isDarkBgCard ? 'bg-slate-600 text-slate-200' : 'bg-gray-200 text-gray-700';
+            const detailPinkTagBgStyle = isDarkBgCard ? 'bg-pink-700 text-pink-100' : 'bg-pink-200 text-pink-700';
+
+            gameDetailsContainer.className = `rounded-lg shadow-xl min-h-[300px] transition-colors duration-300 ease-in-out ${bgCard} p-0`;
+
+            const gameDlcs = game.dlcs || [];
+            const expansions = gameDlcs.filter(dlc => expansionContentTypes.includes(dlc.tipo) || !dlc.tipo);
+            const cosmetics = gameDlcs.filter(dlc => cosmeticContentTypes.includes(dlc.tipo));
+            const expansionIds = new Set(expansions.map(d => d.nome));
+            const uniqueCosmetics = cosmetics.filter(c => !expansionIds.has(c.nome));
+
+            let expansionsHtml = generateSectionHtml('Expansões e Conteúdo Principal', expansions, game.themeColors);
+            let cosmeticsHtml = generateSectionHtml('Pacotes Cosméticos e de Suporte', uniqueCosmetics, game.themeColors);
+            let soundtracksSectionHtml = generateSectionHtml('Trilha(s) Sonora(s)', game.trilhasSonoras || [], game.themeColors);
+            let artbooksSectionHtml = generateSectionHtml('Artbook(s)', game.artbooks || [], game.themeColors);
+
+            let tagsHtml = (game.tagsPersonalizadas || []).map(tag => `<span class="tag ${detailTagBgStyle}">${tag}</span>`).join('');
+            let generosDetalhadosHtml = (game.generosDetalhados || []).map(g => `<span class="tag ${detailPinkTagBgStyle}">${g}</span>`).join('');
+
+            gameDetailsContainer.innerHTML = `
+                <div class="${bgHeader} ${textHeader} p-4 sm:p-6 rounded-t-lg mb-6 shadow-lg">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-3xl font-bold">
+                            <a href="${game.linkSteam}" target="_blank" class="${textHeader} hover:opacity-80 transition-opacity">${game.nome.substring(game.nome.indexOf(' ') + 1)}</a>
+                        </h2>
+                        <div id="favorite-btn-${game.id}" class="favorite-btn ${game.favorito ? 'active' : ''}" title="Marcar como favorito">${game.favorito ? '❤️' : '🤍'}</div>
+                    </div>
+                    <p class="${textHeader} text-sm mt-1">Dev: ${game.desenvolvedora || 'N/A'} | Pub: ${game.publicadora || 'N/A'}</p>
+                    <p class="${textHeader} text-sm">Lançamento: ${game.dataLancamento || 'N/A'}</p>
+                </div>
+
+                <div class="p-4 sm:p-6">
+                    <div class="aspect-video-container mb-6">
+                        <iframe src="${youtubeEmbedUrl}" title="YouTube video player for ${game.nome}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="unsafe-url" allowfullscreen></iframe>
+                    </div>
+                    <img src="${gameCoverUrl}" alt="Capa de ${game.nome.substring(game.nome.indexOf(' ') + 1)}" class="w-full max-w-md mx-auto rounded-md shadow-lg mb-6" onerror="this.style.display='none'">
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h3 class="text-xl font-semibold ${detailHeaderStyle} mb-2">Nossa Avaliação:</h3>
+                            <div id="stars-${game.id}" class="star-rating mb-2"></div>
+                            <h3 class="text-xl font-semibold ${detailHeaderStyle} mb-2 mt-4">Status Atual:</h3>
+                            <select id="status-select-${game.id}" class="block w-full p-2 rounded-md ${detailInputBgStyle} focus:ring-pink-500 focus:border-pink-500">
+                                <option value="Não Jogado" ${game.status === "Não Jogado" ? 'selected' : ''}>Não Jogado</option>
+                                <option value="Queremos Jogar" ${game.status === "Queremos Jogar" ? 'selected' : ''}>💖 Queremos Jogar</option>
+                                <option value="Jogando" ${game.status === "Jogando" ? 'selected' : ''}>🎮 Jogando</option>
+                                <option value="Finalizado" ${game.status === "Finalizado" ? 'selected' : ''}>🏆 Finalizado</option>
+                                <option value="Pausado" ${game.status === "Pausado" ? 'selected' : ''}>⏳ Pausado</option>
+                                <option value="Rejogar" ${game.status === "Rejogar" ? 'selected' : ''}>🔁 Rejogar</option>
+                            </select>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold ${detailHeaderStyle} mb-2">Anotações:</h3>
+                            <textarea id="anotacoes-${game.id}" class="w-full h-24 p-2 rounded-md ${detailInputBgStyle} focus:ring-pink-500 focus:border-pink-500" placeholder="Suas notas sobre o jogo...">${game.anotacoes}</textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold ${detailHeaderStyle} mb-2">Descrição para Nós:</h3>
+                        <p class="${detailContentStyle} leading-relaxed">${game.descricao}</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold ${detailHeaderStyle} mb-2">Gêneros:</h3>
+                        <div class="flex flex-wrap">${generosDetalhadosHtml || 'N/A'}</div>
+                        <h3 class="text-xl font-semibold ${detailHeaderStyle} mb-2 mt-4">Tags:</h3>
+                        <div class="flex flex-wrap">${tagsHtml || 'N/A'}</div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <h3 class="text-xl font-semibold ${detailHeaderStyle} mb-2">Jogadores:</h3>
+                            <p class="${detailContentStyle}">Local: ${game.numJogadores.local || 'N/A'}</p>
+                            <p class="${detailContentStyle}">Online: ${game.numJogadores.online || 'N/A'}</p>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold ${detailHeaderStyle} mb-2">Tempo Estimado (HLTB):</h3>
+                            <p class="${detailContentStyle}">Principal: ${game.tempoEstimado.principal || 'N/A'}</p>
+                            <p class="${detailContentStyle}">Extras: ${game.tempoEstimado.extras || 'N/A'}</p>
+                            <p class="${detailContentStyle}">Completo: ${game.tempoEstimado.completo || 'N/A'}</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1 mt-6">
+                        ${expansionsHtml}
+                        ${cosmeticsHtml}
+                        ${soundtracksSectionHtml}
+                        ${artbooksSectionHtml}
+                    </div>
+                </div>
+            `;
+            
+            renderStars(game.id, game.avaliacao, game.themeColors);
+
+            const anotacoesTextarea = document.getElementById(`anotacoes-${game.id}`);
+            if(anotacoesTextarea) {
+                anotacoesTextarea.addEventListener('input', (e) => { 
+                    const currentGame = gamesData.find(g => g.id === game.id);
+                    if (currentGame) {
+                        currentGame.anotacoes = e.target.value; 
+                        saveUserData(game.id, 'anotacoes', e.target.value);
+                    }
+                });
+            }
+            const statusSelectEl = document.getElementById(`status-select-${game.id}`);
+            if(statusSelectEl) {
+                statusSelectEl.addEventListener('change', (e) => {
+                    const currentGame = gamesData.find(g => g.id === game.id);
+                     if (currentGame) {
+                        currentGame.status = e.target.value;
+                        saveUserData(game.id, 'status', e.target.value);
+                        populateMenus(searchDesktop.value, statusFilterDesktop.value); 
+                     }
+                });
+            }
+            const favoriteBtn = document.getElementById(`favorite-btn-${game.id}`);
+            if(favoriteBtn) {
+                favoriteBtn.addEventListener('click', () => {
+                    const currentGame = gamesData.find(g => g.id === game.id);
+                    if (currentGame) {
+                        currentGame.favorito = !currentGame.favorito;
+                        saveUserData(game.id, 'favorito', currentGame.favorito);
+                        favoriteBtn.classList.toggle('active', currentGame.favorito);
+                        favoriteBtn.textContent = currentGame.favorito ? '❤️' : '🤍';
+                    }
+                });
+            }
+
+            document.querySelectorAll('#gameMenu .menu-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.gameId === game.id) item.classList.add('active');
+            });
+             if (gameSelect.value !== game.id) gameSelect.value = game.id;
+            if (window.innerWidth < 768) mainContent.scrollTop = 0;
+        }
+        
+        function populateMenus(searchTerm = "", statusTerm = "todos") {
+            gameMenu.innerHTML = ''; 
+            gameSelect.innerHTML = ''; 
+
+            const searchTermLower = searchTerm.toLowerCase();
+            const filteredGames = gamesData.filter(game => {
+                const nameMatch = game.nome.toLowerCase().includes(searchTermLower);
+                const statusMatch = statusTerm === "todos" || game.status === statusTerm;
+                return nameMatch && statusMatch;
+            });
+            
+            const currentDisplayedGameId = gameDetailsContainer.dataset.currentGameId;
+
+            if (filteredGames.length === 0) {
+                const noResultsMsg = `<p class="text-slate-500 p-4">Nenhum jogo encontrado.</p>`;
+                gameMenu.innerHTML = noResultsMsg;
+                gameSelect.innerHTML = `<option value="">Nenhum jogo encontrado</option>`;
+            } else {
+                 filteredGames.forEach(game => {
+                    let statusIcon = "";
+                    if (game.status === "Queremos Jogar") statusIcon = "💖 ";
+                    else if (game.status === "Jogando") statusIcon = "🎮 ";
+                    else if (game.status === "Finalizado") statusIcon = "🏆 ";
+                    else if (game.status === "Pausado") statusIcon = "⏳ ";
+                    else if (game.status === "Rejogar") statusIcon = "🔁 ";
+                    
+                    const menuItemText = statusIcon + game.nome;
+
+                    const menuItem = document.createElement('a');
+                    menuItem.href = "#";
+                    menuItem.textContent = menuItemText;
+                    menuItem.dataset.gameId = game.id;
+                    menuItem.className = "block menu-item text-slate-700 hover:bg-pink-500 hover:text-white px-4 py-2 rounded-md transition-colors duration-150 ease-in-out";
+                    if (game.id === currentDisplayedGameId) {
+                        menuItem.classList.add('active');
+                    }
+                    menuItem.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        displayGameDetails(game);
+                    });
+                    gameMenu.appendChild(menuItem);
+
+                    const option = document.createElement('option');
+                    option.value = game.id;
+                    option.textContent = menuItemText;
+                    if (game.id === currentDisplayedGameId) {
+                        option.selected = true;
+                    }
+                    gameSelect.appendChild(option);
+                });
+            }
+            
+            const gameStillInFilteredList = filteredGames.find(g => g.id === currentDisplayedGameId);
+
+            if (filteredGames.length > 0) {
+                if (gameStillInFilteredList) {
+                    if (gameSelect.value !== gameStillInFilteredList.id) gameSelect.value = gameStillInFilteredList.id;
+                } else {
+                    displayGameDetails(filteredGames[0]);
+                }
+            } else if (gamesData.length > 0 && searchTerm === "" && statusTerm === "todos") {
+                displayGameDetails(gamesData[0]);
+            } else {
+                gameDetailsContainer.innerHTML = '<p class="text-slate-500 text-center py-10 px-6">Nenhum jogo corresponde aos filtros.</p>';
+                gameDetailsContainer.className = `rounded-lg shadow-xl min-h-[300px] transition-colors duration-300 ease-in-out bg-white`;
+                gameDetailsContainer.dataset.currentGameId = "";
+            }
+        }
+
+        searchDesktop.addEventListener('input', (e) => { searchMobile.value = e.target.value; populateMenus(e.target.value, statusFilterDesktop.value); });
+        statusFilterDesktop.addEventListener('change', (e) => { statusFilterMobile.value = e.target.value; populateMenus(searchDesktop.value, e.target.value); });
+        searchMobile.addEventListener('input', (e) => { searchDesktop.value = e.target.value; populateMenus(e.target.value, statusFilterMobile.value); });
+        statusFilterMobile.addEventListener('change', (e) => { statusFilterDesktop.value = e.target.value; populateMenus(searchMobile.value, e.target.value); });
+        gameSelect.addEventListener('change', (e) => {
+            const game = gamesData.find(g => g.id === e.target.value);
+            if (game) displayGameDetails(game);
+        });
+        
+        function adjustMainContentHeight() {
+            if (window.innerWidth < 768 && mobileControlsHeader) { 
+                 mainContent.style.height = `calc(100vh - ${mobileControlsHeader.offsetHeight}px)`;
+            } else {
+                mainContent.style.height = ''; 
+            }
+        }
+
+        window.addEventListener('load', () => {
+            loadAndMergeGamesData(); 
+            populateMenus(); 
+            
+            let gameToDisplayInitially = null;
+            if (gamesData.length > 0) {
+                if (gameSelect.options.length > 0 && gameSelect.options[0].value) {
+                    const firstGameIdInSelect = gameSelect.options[0].value;
+                    gameToDisplayInitially = gamesData.find(g => g.id === firstGameIdInSelect);
+                }
+                if (!gameToDisplayInitially && gamesData.length > 0) { 
+                    gameToDisplayInitially = gamesData[0];
+                }
+            }
+
+            if (gameToDisplayInitially) {
+                displayGameDetails(gameToDisplayInitially);
+            } else {
+                gameDetailsContainer.innerHTML = '<p class="text-slate-500 text-center py-10 px-6">Nenhum jogo na lista.</p>';
+                gameDetailsContainer.className = `rounded-lg shadow-xl min-h-[300px] transition-colors duration-300 ease-in-out bg-white`;
+            }
+            adjustMainContentHeight();
+        });
+        window.addEventListener('resize', adjustMainContentHeight);
+    </script>
+</body>
+</html>
+
